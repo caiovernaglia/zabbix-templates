@@ -21,12 +21,14 @@ zabbix-templates/
 └── templates/
     └── <category>/
         └── <template_name>/
-            ├── template_<category>_<template_name>.yaml
-            └── README.md
+            └── <zabbix_version>
+                 ├── template_<category>_<template_name>.yaml
+                 └── README.md
 ```
 
 - **`<category>`** groups templates by device or system type (e.g. `access_control`, `net`, `app`).
 - **`<template_name>`** is the product followed by the collection method (e.g. `hikvision_acs_http`).
+- **`<zabbix_version>`** is the zabbix supported version.
 - Template files are exported in **YAML**, the default Zabbix export format.
 
 ## Installation
