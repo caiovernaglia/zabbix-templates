@@ -50,8 +50,8 @@ The ISAPI user must be able to read the following endpoints:
 
 ## Setup
 
-1. **Create a dedicated user on the device.**
-   In the device web interface, create a user named `zbx_monitor` with the lowest privilege level that can read the endpoints listed above. Avoid using the `admin` account.
+1. **Create a dedicated user on the device (recommended).**
+   The template uses the device's default `admin` user. For better security, create a user (e.g. `zbx_monitor`) with the lowest privilege level that can read the endpoints listed above, and set it in `{$ISAPI.USER}`.
 2. **Check the HTTP(S) service.**
    Make sure HTTP or HTTPS is enabled on the device and reachable from the Zabbix server or proxy that monitors the host.
 3. **Import the template** in Zabbix (**Data collection → Templates → Import**).
@@ -69,7 +69,7 @@ The ISAPI user must be able to read the following endpoints:
 
 | Macro | Default | Description |
 |---|---|---|
-| `{$ISAPI.USER}` | `zbx_monitor` | ISAPI user. A dedicated read-only user is recommended. |
+| `{$ISAPI.USER}` | `admin` | ISAPI user. The device's default user; a dedicated read-only user is recommended. |
 | `{$ISAPI.PASSWORD}` | _(secret)_ | ISAPI user password. |
 | `{$ISAPI.SCHEME}` | `http` | ISAPI access protocol: `http` or `https`. |
 | `{$ISAPI.PORT}` | `80` | ISAPI port: `80` for HTTP, `443` for HTTPS, or the device's custom port. |
