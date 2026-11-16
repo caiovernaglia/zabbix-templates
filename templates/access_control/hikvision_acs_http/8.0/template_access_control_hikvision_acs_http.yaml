@@ -1104,7 +1104,7 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_acs.time.drift
           value_type: FLOAT
-          units: s
+          units: '!s'
           description: 'Difference between the device clock and the Zabbix proxy/server clock. Positive = device ahead.'
           preprocessing:
             - type: JAVASCRIPT
@@ -1764,7 +1764,7 @@ zabbix_export:
           description: 'Set to 1 if wireless is allowed to be enabled on this device. 0 raises a Warning if it is enabled.'
       dashboards:
         - uuid: dcb58c72fcee4866a766971c159a4e48
-          name: 'Hikvision acs: Overview'
+          name: 'Hikvision ACS: Overview'
           pages:
             - name: Overview
               widgets:
@@ -1823,6 +1823,7 @@ zabbix_export:
                       name: value_size
                       value: '55'
                 - type: svggraph
+                  name: Capacity
                   'y': '6'
                   width: '37'
                   height: '5'
@@ -1870,7 +1871,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Hikvision access control by HTTP'
-                        key: 'hikvision_acs.capacity[users,used]'
+                        key: 'hikvision_acs.capacity[faces,used]'
                     - type: INTEGER
                       name: show.0
                       value: '2'
@@ -1977,7 +1978,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Hikvision access control by HTTP'
-                        key: 'hikvision_acs.capacity[users,used]'
+                        key: 'hikvision_acs.capacity[cards,used]'
                     - type: INTEGER
                       name: show.0
                       value: '2'
@@ -1988,6 +1989,7 @@ zabbix_export:
                       name: value_size
                       value: '55'
                 - type: svggraph
+                  name: 'ICMP Response time'
                   x: '37'
                   'y': '6'
                   width: '35'
@@ -2199,19 +2201,19 @@ zabbix_export:
                       value: '-999999'
                     - type: STRING
                       name: thresholds.1.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '-301'
-                    - type: STRING
-                      name: thresholds.2.color
                       value: 3BC97D
                     - type: STRING
-                      name: thresholds.2.threshold
+                      name: thresholds.1.threshold
                       value: '-300'
                     - type: STRING
+                      name: thresholds.2.color
+                      value: E65660
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '300'
+                    - type: STRING
                       name: units
-                      value: '!s'
+                      value: s
                     - type: INTEGER
                       name: value_size
                       value: '40'
@@ -2372,19 +2374,16 @@ zabbix_export:
       ymin_type_1: FIXED
       graph_items:
         - color: 2774A4
-          calc_fnc: ALL
           item:
             host: 'Hikvision access control by HTTP'
             key: 'hikvision_acs.capacity[users,used]'
         - sortorder: '1'
           color: F63100
-          calc_fnc: ALL
           item:
             host: 'Hikvision access control by HTTP'
             key: 'hikvision_acs.capacity[faces,used]'
         - sortorder: '2'
           color: 199C0D
-          calc_fnc: ALL
           item:
             host: 'Hikvision access control by HTTP'
             key: 'hikvision_acs.capacity[cards,used]'

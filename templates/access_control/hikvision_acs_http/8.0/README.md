@@ -278,6 +278,41 @@ These triggers must be closed manually (acknowledge to close).
 | Hikvision ACS: Firmware version has changed | Information |
 | Hikvision ACS: Equipment has been replaced | Information |
 
+## Graphs
+
+| Name | Items | Notes |
+|---|---|---|
+| Capacity: Usage | Capacity: Users: Used, Capacity: Faces: Used, Capacity: Cards: Used | Y axis starts at 0, so changes are shown in proportion to the total. |
+
+## Dashboards
+
+### Hikvision acs: Overview
+
+Single-page overview of the device, available on each host linked to the template (**Monitoring → Hosts → Dashboards**).
+
+| Section | Widget | Content |
+|---|---|---|
+| Device | Host card | Host name, problem count by severity and device inventory (name, model, serial number, firmware, MAC addresses). Requires **Inventory mode = Automatic** on the host. |
+| Connectivity | Item value (×8) | ISAPI, ICMP ping, ICMP response time, clock drift, Ethernet, wireless, VoIP and Hik-Connect status, colored by state. |
+| Capacity | Item value (×3) | Current number of users, faces and cards. |
+| Capacity graph | Graph | Users, faces and cards over the last 12 hours. Missing data is filled with the last known value. |
+| ICMP response time graph | Graph | ICMP response time over the last 12 hours. |
+
+Status colors used in the connectivity tiles:
+
+| Tile | Green | Yellow | Red | Gray |
+|---|---|---|---|---|
+| ISAPI | OK (2xx) | Request rejected (4xx) | No response or server error (5xx) | |
+| ICMP ping | Up | | Down | |
+| ICMP response time | < 100 ms | 100–300 ms | ≥ 300 ms | |
+| Clock drift | Within ±300 s | | Beyond ±300 s | |
+| Ethernet | Connected | | Disconnected | |
+| Wireless | Connected | | Disconnected | Not present |
+| VoIP | Registered | | Not registered | |
+| Hik-Connect | Connected | Disconnected | | Disabled |
+
+The clock drift tile uses fixed thresholds matching the default `{$TIME.DRIFT.MAX}` (300 s). If the macro is changed on a host, the tile colors do not follow it.
+
 ## Known limitations
 
 - **Ethernet connection on dashboards.** On wired-only devices, `Network: Ethernet connection` cannot report a disconnection: when the cable is down, the device is unreachable and the item keeps its last value. Use `ISAPI: Status` or ICMP ping as the online/offline indicator.
