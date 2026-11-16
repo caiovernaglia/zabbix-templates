@@ -28,7 +28,7 @@ The template monitors:
 
 | Model | Firmware | Notes |
 |---|---|---|
-| DS-K1T343MX | _to be filled_ | |
+| DS-K1T343MWX | V4.48.40 build 260629 | |
 
 Other MinMoe models exposing the same ISAPI endpoints are expected to work but have not been tested. Reports of tested models and firmware versions are welcome.
 
