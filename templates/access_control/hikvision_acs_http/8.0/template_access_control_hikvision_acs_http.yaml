@@ -2163,9 +2163,15 @@ zabbix_export:
                   'y': '4'
                   width: '17'
                   fields:
+                    - type: STRING
+                      name: description
+                      value: RESERVED
                     - type: INTEGER
-                      name: decimal_places
-                      value: '0'
+                      name: desc_size
+                      value: '55'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -2173,13 +2179,7 @@ zabbix_export:
                         key: 'hikvision_acs.capacity[users,used]'
                     - type: INTEGER
                       name: show.0
-                      value: '2'
-                    - type: INTEGER
-                      name: show.1
-                      value: '4'
-                    - type: INTEGER
-                      name: value_size
-                      value: '55'
+                      value: '1'
                 - type: item
                   name: 'Clock drift'
                   x: '62'
@@ -2210,10 +2210,10 @@ zabbix_export:
                       value: E65660
                     - type: STRING
                       name: thresholds.2.threshold
-                      value: '300'
-                    - type: STRING
-                      name: units
-                      value: s
+                      value: '301'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
                     - type: INTEGER
                       name: value_size
                       value: '40'
