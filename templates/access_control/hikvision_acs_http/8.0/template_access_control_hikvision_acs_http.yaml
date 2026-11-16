@@ -1,0 +1,1869 @@
+zabbix_export:
+  version: '8.0'
+  template_groups:
+    - uuid: 3f3e16c00c2b4bc9bd85cd25e955a513
+      name: 'Templates/Access control'
+  templates:
+    - uuid: fc2ef8f76f084bad810274087334f239
+      template: 'Hikvision access control by HTTP'
+      name: 'Hikvision access control by HTTP'
+      description: |
+        Monitors Hikvision MinMoe access control readers via ISAPI (HTTP agent): availability, capacity, time, network, VoIP, Hik-Connect and security settings.
+        
+        Source: https://github.com/caiovernaglia/zabbix-templates/templates/access_control/hikvision_acs_http/8.0
+      vendor:
+        name: 'Yellen Group'
+        version: 8.0-1
+      templates:
+        - name: 'ICMP Ping'
+      groups:
+        - name: 'Templates/Access control'
+      items:
+        - uuid: 29aa33316e574d74bdad1208e4349fb6
+          name: 'Capacity: Cards: Used'
+          type: DEPENDENT
+          key: 'hikvision_acs.capacity[cards,used]'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.UserInfoCount.bindCardUserNumber
+          master_item:
+            key: hikvision_acs.get_device_capacity
+          tags:
+            - tag: component
+              value: capacity
+            - tag: resource
+              value: cards
+          triggers:
+            - uuid: d1a534dd9f82454197f0b744cc906795
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[cards,used])>{$CAPACITY.CARDS.MAX}*{$CAPACITY.THRESHOLD.WARN}/100'
+              name: 'Capacity: Cards nearly full (> {$CAPACITY.THRESHOLD.WARN}% of {$CAPACITY.CARDS.MAX})'
+              opdata: 'Current cards count: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Cards count greater than warning limit.'
+              tags:
+                - tag: resource
+                  value: cards
+                - tag: scope
+                  value: capacity
+            - uuid: b58a7cbc4175410bb4e4c2b3d97dc009
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[cards,used])>{$CAPACITY.CARDS.MAX}*{$CAPACITY.THRESHOLD.INFO}/100'
+              name: 'Capacity: Cards usage is high (> {$CAPACITY.THRESHOLD.INFO}% of {$CAPACITY.CARDS.MAX})'
+              opdata: 'Current cards count: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Cards count greater than info limit.'
+              dependencies:
+                - name: 'Capacity: Cards nearly full (> {$CAPACITY.THRESHOLD.WARN}% of {$CAPACITY.CARDS.MAX})'
+                  expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[cards,used])>{$CAPACITY.CARDS.MAX}*{$CAPACITY.THRESHOLD.WARN}/100'
+              tags:
+                - tag: resource
+                  value: cards
+                - tag: scope
+                  value: capacity
+        - uuid: 16eb032d181b457298a8fa5c4eec7f10
+          name: 'Capacity: Faces: Used'
+          type: DEPENDENT
+          key: 'hikvision_acs.capacity[faces,used]'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.UserInfoCount.bindFaceUserNumber
+          master_item:
+            key: hikvision_acs.get_device_capacity
+          tags:
+            - tag: component
+              value: capacity
+            - tag: resource
+              value: faces
+          triggers:
+            - uuid: e839b529791d4fb0adda62a5b8dc530f
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[faces,used])>{$CAPACITY.FACES.MAX}*{$CAPACITY.THRESHOLD.WARN}/100'
+              name: 'Capacity: Faces nearly full (> {$CAPACITY.THRESHOLD.WARN}% of {$CAPACITY.FACES.MAX})'
+              opdata: 'Current faces count: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Faces count greater than warning limit.'
+              tags:
+                - tag: resource
+                  value: faces
+                - tag: scope
+                  value: capacity
+            - uuid: a1ac046cd36b48348e8ca3ce04dd435e
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[faces,used])>{$CAPACITY.FACES.MAX}*{$CAPACITY.THRESHOLD.INFO}/100'
+              name: 'Capacity: Faces usage is high (> {$CAPACITY.THRESHOLD.INFO}% of {$CAPACITY.FACES.MAX})'
+              opdata: 'Current faces count: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Faces count greater than info limit.'
+              dependencies:
+                - name: 'Capacity: Faces nearly full (> {$CAPACITY.THRESHOLD.WARN}% of {$CAPACITY.FACES.MAX})'
+                  expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[faces,used])>{$CAPACITY.FACES.MAX}*{$CAPACITY.THRESHOLD.WARN}/100'
+              tags:
+                - tag: resource
+                  value: faces
+                - tag: scope
+                  value: capacity
+        - uuid: 7025592634c04dcd8a1ddc66b101342f
+          name: 'Capacity: Users: Used'
+          type: DEPENDENT
+          key: 'hikvision_acs.capacity[users,used]'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.UserInfoCount.userNumber
+          master_item:
+            key: hikvision_acs.get_device_capacity
+          tags:
+            - tag: component
+              value: capacity
+            - tag: resource
+              value: users
+          triggers:
+            - uuid: 8ff827e3f5d94917b1701d5907e16395
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[users,used])>{$CAPACITY.USERS.MAX}*{$CAPACITY.THRESHOLD.WARN}/100'
+              name: 'Capacity: Users nearly full (> {$CAPACITY.THRESHOLD.WARN}% of {$CAPACITY.USERS.MAX})'
+              opdata: 'Current users count: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Users count greater than warning limit.'
+              tags:
+                - tag: resource
+                  value: users
+                - tag: scope
+                  value: capacity
+            - uuid: cd0dedb3c0b84afbb1f5385fff0477b6
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[users,used])>{$CAPACITY.USERS.MAX}*{$CAPACITY.THRESHOLD.INFO}/100'
+              name: 'Capacity: Users usage is high (> {$CAPACITY.THRESHOLD.INFO}% of {$CAPACITY.USERS.MAX})'
+              opdata: 'Current users count: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Users count greater than info limit.'
+              dependencies:
+                - name: 'Capacity: Users nearly full (> {$CAPACITY.THRESHOLD.WARN}% of {$CAPACITY.USERS.MAX})'
+                  expression: 'last(/Hikvision access control by HTTP/hikvision_acs.capacity[users,used])>{$CAPACITY.USERS.MAX}*{$CAPACITY.THRESHOLD.WARN}/100'
+              tags:
+                - tag: resource
+                  value: users
+                - tag: scope
+                  value: capacity
+        - uuid: 637ff3eb3661426a82a4013b9593d74d
+          name: 'Hik-Connect: Status'
+          type: DEPENDENT
+          key: hikvision_acs.cloud.status
+          valuemap:
+            name: 'Cloud status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.AcsWorkStatus.ezvizStatus
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  if (value === 'notEnabled') return 0;
+                  if (value === 'unregistered') return 1;
+                  if (value === 'connect') return 2;
+                  throw 'ezvizStatus desconhecido: ' + value;
+          master_item:
+            key: hikvision_acs.get_work_status
+          tags:
+            - tag: component
+              value: cloud
+            - tag: component
+              value: communication
+          triggers:
+            - uuid: 2ad184c173eb4c28b50d8ecae2ece541
+              expression: '(last(/Hikvision access control by HTTP/hikvision_acs.cloud.status,#1)>0)<>(last(/Hikvision access control by HTTP/hikvision_acs.cloud.status,#2)>0)'
+              recovery_mode: NONE
+              name: 'Hik-Connect: Configuration has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'Hik-Connect has been enabled or disabled. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Hik-Connect: Enabled on a device where it is not allowed'
+                  expression: 'last(/Hikvision access control by HTTP/hikvision_acs.cloud.status)>0 and {$HIKCONNECT.ALLOWED}=0'
+              tags:
+                - tag: scope
+                  value: notice
+            - uuid: 361c8f79688f4045997cee8eb34f9fb3
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.cloud.status)>0 and {$HIKCONNECT.ALLOWED}=0'
+              name: 'Hik-Connect: Enabled on a device where it is not allowed'
+              opdata: 'Hik-Connect: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Hik-Connect is enabled, but this device is not allowed to use it ({$HIKCONNECT.ALLOWED}=0). Disable it or review the macro.'
+              tags:
+                - tag: scope
+                  value: security
+            - uuid: 0a9557bba5384eaba176afa8d42d0649
+              expression: 'max(/Hikvision access control by HTTP/hikvision_acs.cloud.status,#2)=1 and {$HIKCONNECT.ALLOWED}=1'
+              name: 'Hik-Connect: Not connected'
+              opdata: 'Hik-Connect: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Hik-Connect is enabled and allowed, but the device is not connected to the Hik-Connect cloud. Mobile app features will not work.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 350b580e498d4f1f92024e6aaa2cde94
+          name: 'Device: Firmware'
+          type: DEPENDENT
+          key: hikvision_acs.device.firmware
+          value_type: CHAR
+          inventory_link: SOFTWARE
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value).DeviceInfo;
+                  return d.firmwareVersion + ' ' + d.firmwareReleasedDate;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_device_info
+          tags:
+            - tag: component
+              value: system
+          triggers:
+            - uuid: 5c35fbb230b14b3f91845b04d3e25835
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.device.firmware,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.device.firmware,#2) and length(last(/Hikvision access control by HTTP/hikvision_acs.device.firmware))>0'
+              recovery_mode: NONE
+              name: 'Hikvision ACS: Firmware version has changed'
+              event_name: 'Hikvision Access Control: Firmware version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Firmware version has changed. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 093ccc96e39a4484af661c990f46c209
+          name: 'Device: Hardware version'
+          type: DEPENDENT
+          key: hikvision_acs.device.hardware
+          value_type: CHAR
+          inventory_link: HARDWARE
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.hardwareVersion
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_device_info
+          tags:
+            - tag: component
+              value: system
+        - uuid: 51682b50b34c48e4b58e1ed5d0118700
+          name: 'Device: Manufacturer'
+          type: DEPENDENT
+          key: hikvision_acs.device.manufacturer
+          value_type: CHAR
+          inventory_link: VENDOR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.manufacturer
+            - type: JAVASCRIPT
+              parameters:
+                - 'return value.charAt(0).toUpperCase() + value.slice(1);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_device_info
+          tags:
+            - tag: component
+              value: system
+        - uuid: 49e89c996d614d89852ac3bb901e1bc4
+          name: 'Device: Model'
+          type: DEPENDENT
+          key: hikvision_acs.device.model
+          value_type: CHAR
+          inventory_link: MODEL
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.model
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_device_info
+          tags:
+            - tag: component
+              value: system
+        - uuid: fc33f024d61743ceb9f967a83d9af62b
+          name: 'Device: Name'
+          type: DEPENDENT
+          key: hikvision_acs.device.name
+          value_type: CHAR
+          inventory_link: NAME
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.deviceName
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_device_info
+          tags:
+            - tag: component
+              value: system
+        - uuid: f2abda9923be453290b8f9d9046b0b77
+          name: 'Device: Serial number'
+          type: DEPENDENT
+          key: hikvision_acs.device.serial
+          value_type: CHAR
+          inventory_link: SERIALNO_A
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.serialNumber
+            - type: REGEX
+              parameters:
+                - '.{9}$'
+                - \0
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_device_info
+          tags:
+            - tag: component
+              value: system
+          triggers:
+            - uuid: 9a67ab2a04cc405cbe1eca6d5a80d955
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.device.serial,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.device.serial,#2) and length(last(/Hikvision access control by HTTP/hikvision_acs.device.serial))>0'
+              recovery_mode: NONE
+              name: 'Hikvision ACS: Equipment has been replaced'
+              event_name: 'Hikvision Access Control: Equipment has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Equipment serial number has changed. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 3af31899ef584c1eb8efacbf0f2dd50d
+          name: 'Device: Type'
+          type: DEPENDENT
+          key: hikvision_acs.device.type
+          value_type: CHAR
+          inventory_link: TYPE
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.subDeviceType
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  return value
+                      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+                      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+                      .replace(/^./, function (c) { return c.toUpperCase(); });
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_device_info
+          tags:
+            - tag: component
+              value: system
+        - uuid: fb1b234e50414a56a1c78f9f68fa8feb
+          name: 'Ethernet: Addressing type'
+          type: DEPENDENT
+          key: hikvision_acs.eth.addressing_type
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.NetworkInterfaceList.NetworkInterface[?(@.id==''1'')].IPAddress.addressingType.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: ethernet
+            - tag: component
+              value: network
+          triggers:
+            - uuid: dfb790c93959413fb963027003e3fe0e
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.eth.addressing_type)="dynamic"'
+              name: 'Ethernet: DHCP addressing in use'
+              opdata: 'Addressing: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Device is using DHCP. If the IP address changes, monitoring and VMS integrations will be lost. Configure a static IP address.'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: cc5bd3bde30d4e38a028485f6d9c07fc
+          name: 'Network: Ethernet connection'
+          type: DEPENDENT
+          key: hikvision_acs.eth.connection
+          valuemap:
+            name: 'Connection status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AcsWorkStatus.InterfaceStatusList[?(@.id==1)].netStatus.first()'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  if (value === 'connect') return 1;
+                  if (value === 'disconnect') return 0;
+                  throw 'netStatus desconhecido: ' + value;
+          master_item:
+            key: hikvision_acs.get_work_status
+          tags:
+            - tag: component
+              value: health
+            - tag: component
+              value: network
+        - uuid: 85b10432348f4891b1b711cbe4a08fa8
+          name: 'Ethernet: Primary DNS'
+          type: DEPENDENT
+          key: hikvision_acs.eth.dns_primary
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.NetworkInterfaceList.NetworkInterface[?(@.id==''1'')].IPAddress.PrimaryDNS.ipAddress.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: ethernet
+            - tag: component
+              value: network
+        - uuid: 103b0e25e05a463d8d388194e852e09f
+          name: 'Ethernet: Secondary DNS'
+          type: DEPENDENT
+          key: hikvision_acs.eth.dns_secondary
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.NetworkInterfaceList.NetworkInterface[?(@.id==''1'')].IPAddress.SecondaryDNS.ipAddress.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: ethernet
+            - tag: component
+              value: network
+        - uuid: 561aca8a7c7b4493bbf534ec2a4483b4
+          name: 'Ethernet: Gateway'
+          type: DEPENDENT
+          key: hikvision_acs.eth.gateway
+          value_type: CHAR
+          inventory_link: HOST_ROUTER
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.NetworkInterfaceList.NetworkInterface[?(@.id==''1'')].IPAddress.DefaultGateway.ipAddress.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: ethernet
+            - tag: component
+              value: network
+        - uuid: 72838284b6d44b8f893677e4b1a7387e
+          name: 'Ethernet: IP address'
+          type: DEPENDENT
+          key: hikvision_acs.eth.ip
+          value_type: CHAR
+          inventory_link: HOST_NETWORKS
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.NetworkInterfaceList.NetworkInterface[?(@.id==''1'')].IPAddress.ipAddress.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: ethernet
+            - tag: component
+              value: network
+        - uuid: f9edcf38ed454d25ad4862daa7e37541
+          name: 'Ethernet: MAC address'
+          type: DEPENDENT
+          key: hikvision_acs.eth.mac
+          value_type: CHAR
+          inventory_link: MACADDRESS_A
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.NetworkInterfaceList.NetworkInterface[?(@.id==''1'')].macAddress.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: ethernet
+            - tag: component
+              value: network
+        - uuid: cd0f101d00c448e8b5d98e41113f2614
+          name: 'Ethernet: Subnet mask'
+          type: DEPENDENT
+          key: hikvision_acs.eth.subnet_mask
+          value_type: CHAR
+          inventory_link: HOST_NETMASK
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.NetworkInterfaceList.NetworkInterface[?(@.id==''1'')].IPAddress.subnetMask.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: ethernet
+            - tag: component
+              value: network
+        - uuid: 1c847ec812c84b6ea57296cc26319c67
+          name: 'Raw: Admin accesses'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_admin_accesses
+          delay: 1h
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          preprocessing:
+            - type: XML_TO_JSON
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/Security/adminAccesses'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: d9e1672b1c46469d91929422df32b921
+          name: 'Raw: Capacity'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_device_capacity
+          delay: 30m
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/AccessControl/UserInfo/Count'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: bc6a945240814501bed972407ed8c159
+          name: 'Raw: Device info'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_device_info
+          delay: 6h
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          preprocessing:
+            - type: XML_TO_JSON
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/System/deviceInfo'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 572504e41ee5438997e11064279d5eec
+          name: 'Raw: Network interfaces'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_network_interfaces
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var o;
+                  try { o = JSON.parse(value); } catch (e) { throw 'Resposta não é JSON válido (falha de autenticação?)'; }
+                  if (!o || !o.NetworkInterfaceList) throw 'Resposta sem NetworkInterfaceList';
+                  var l = o.NetworkInterfaceList.NetworkInterface;
+                  o.NetworkInterfaceList.NetworkInterface = Array.isArray(l) ? l : (l ? [l] : []);
+                  return JSON.stringify(o);
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/System/Network/interfaces'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 9f442f0911a74a4982ed5f9600078990
+          name: 'Raw: NTP servers'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_ntp_servers
+          delay: 1h
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          preprocessing:
+            - type: XML_TO_JSON
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/System/time/ntpServers'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: b9048528f0d94614bf7871ef56c90db3
+          name: 'Raw: SIP servers'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_sip_servers
+          delay: 2m
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          preprocessing:
+            - type: XML_TO_JSON
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/System/Network/SIP'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 8711b65f6018465981f8522e6c6869ec
+          name: 'Raw: Time'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_time
+          delay: 15m
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          preprocessing:
+            - type: XML_TO_JSON
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/System/time'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: ceae92388932430c928fb41e67adba84
+          name: 'Raw: Work status'
+          type: HTTP_AGENT
+          key: hikvision_acs.get_work_status
+          delay: 5m
+          history: '0'
+          value_type: TEXT
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/AccessControl/AcsWorkStatus?format=json'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: ab35e9039d0b4b7183c9ecd93f4b3352
+          name: 'ISAPI: Status'
+          type: HTTP_AGENT
+          key: hikvision_acs.isapi.status
+          delay: 5m
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          valuemap:
+            name: 'HTTP status'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - '-1'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var m = value.match(/HTTP\/[\d.]+\s+\d{3}/g);
+                  if (!m) throw 'Linha de status HTTP não encontrada';
+                  return parseInt(m[m.length - 1].split(/\s+/)[1], 10);
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/System/deviceInfo'
+          status_codes: 100-599
+          retrieve_mode: HEADERS
+          tags:
+            - tag: component
+              value: communication
+            - tag: component
+              value: health
+          triggers:
+            - uuid: aadfbf27375244af91e74df025900f5a
+              expression: |
+                count(/Hikvision access control by HTTP/hikvision_acs.isapi.status,#2,"eq",0)
+                +count(/Hikvision access control by HTTP/hikvision_acs.isapi.status,#2,"ge",500)=2
+              name: 'ISAPI: Service is unavailable'
+              opdata: 'Status: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'ISAPI did not respond (timeout/connection refused) or returned a server error (5xx) in the last 2 checks.'
+              dependencies:
+                - name: 'ICMP Ping: Unavailable by ICMP ping'
+                  expression: 'max(/Hikvision access control by HTTP/icmpping,#3)=0'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: afc7df0dff6e4c948629cbc4c0dae5a0
+              expression: |
+                last(/Hikvision access control by HTTP/hikvision_acs.isapi.status)>=400
+                and last(/Hikvision access control by HTTP/hikvision_acs.isapi.status)<500
+              name: 'ISAPI: Unexpected response code ({ITEM.LASTVALUE1})'
+              opdata: 'Status: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'ISAPI rejected the request (4xx). Possible configuration error: check credentials, user permissions and URL.'
+              dependencies:
+                - name: 'ISAPI: Service is unavailable'
+                  expression: |
+                    count(/Hikvision access control by HTTP/hikvision_acs.isapi.status,#2,"eq",0)
+                    +count(/Hikvision access control by HTTP/hikvision_acs.isapi.status,#2,"ge",500)=2
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: c5e4cc2b344a45408d7e015e43f818b2
+          name: 'NTP: Port'
+          type: DEPENDENT
+          key: hikvision_acs.ntp.port
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.NTPServerList.NTPServer.portNo
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_ntp_servers
+          tags:
+            - tag: component
+              value: ntp
+            - tag: component
+              value: system
+        - uuid: ff9f3e9af7374daab799b3f9a89e4536
+          name: 'NTP: Server'
+          type: DEPENDENT
+          key: hikvision_acs.ntp.server
+          value_type: CHAR
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var s = JSON.parse(value).NTPServerList.NTPServer;
+                  return s.addressingFormatType === 'hostname' ? s.hostName : s.ipAddress;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_ntp_servers
+          tags:
+            - tag: component
+              value: ntp
+            - tag: component
+              value: system
+        - uuid: 02de4041bc08477e951868a2d5f754e9
+          name: 'NTP: Sync interval'
+          type: DEPENDENT
+          key: hikvision_acs.ntp.sync_interval
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.NTPServerList.NTPServer.synchronizeInterval
+            - type: MULTIPLIER
+              parameters:
+                - '60'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_ntp_servers
+          tags:
+            - tag: component
+              value: ntp
+            - tag: component
+              value: system
+        - uuid: d42687fe6951457894a3b0320e6d7fec
+          name: 'Security: HTTP'
+          type: DEPENDENT
+          key: hikvision_acs.security.http.enabled
+          valuemap:
+            name: 'Enabled status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''HTTP'')].enabled.first()'
+            - type: BOOL_TO_DECIMAL
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+        - uuid: b4493404aaa748e6bdfd2e841c91b9b0
+          name: 'Security: HTTP port'
+          type: DEPENDENT
+          key: hikvision_acs.security.http.port
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''HTTP'')].portNo.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: f45fe968e7864477b541b534c125be50
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.http.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.http.port,#2)'
+              recovery_mode: NONE
+              name: 'Security: HTTP port has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 5db3e0bc67df4dafb5368822f2f1b492
+          name: 'Security: HTTPS'
+          type: DEPENDENT
+          key: hikvision_acs.security.https.enabled
+          valuemap:
+            name: 'Enabled status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''HTTPS'')].enabled.first()'
+            - type: BOOL_TO_DECIMAL
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+        - uuid: ff0060ab4f3944ba83690fbb8b03e326
+          name: 'Security: HTTPS port'
+          type: DEPENDENT
+          key: hikvision_acs.security.https.port
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''HTTPS'')].portNo.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 19362285579b4e8ab8430a8ee62c2c23
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.https.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.https.port,#2)'
+              recovery_mode: NONE
+              name: 'Security: HTTPS port has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 51d8230c5b0b4db49986ed5c1b35e743
+          name: 'Security: RTSP port'
+          type: DEPENDENT
+          key: hikvision_acs.security.rtsp.port
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''RTSP'')].portNo.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 24695e1ec0a74ad299a1f4b4ee13cb68
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.rtsp.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.rtsp.port,#2)'
+              recovery_mode: NONE
+              name: 'Security: RTSP port has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 9278eb34185f432b9b0a78a6d6a21ddf
+          name: 'Security: SDK port'
+          type: DEPENDENT
+          key: hikvision_acs.security.sdk.port
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''DEV_MANAGE'')].portNo.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: aed27358f96b44cfa49f358e24e69ea3
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.sdk.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.sdk.port,#2)'
+              recovery_mode: NONE
+              name: 'Security: SDK port has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: b9f1a35cb9b249f383854d8446e382fe
+          name: 'Security: SSH'
+          type: HTTP_AGENT
+          key: hikvision_acs.security.ssh.enabled
+          delay: 1h
+          authtype: DIGEST
+          username: '{$ISAPI.USER}'
+          password: '{$ISAPI.PASSWORD}'
+          valuemap:
+            name: 'Enabled status'
+          preprocessing:
+            - type: XMLPATH
+              parameters:
+                - 'string(//*[local-name()=''enabled''])'
+            - type: BOOL_TO_DECIMAL
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          timeout: 3s
+          url: '{$ISAPI.SCHEME}://{HOST.CONN}:{$ISAPI.PORT}/ISAPI/System/Network/ssh'
+          status_codes: '200, 401'
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: cccec4d70cfc49918ffc676c6d91ea6a
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.ssh.enabled,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.ssh.enabled,#2)'
+              recovery_mode: NONE
+              name: 'Security: SSH configuration has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'SSH has been enabled or disabled. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Security: SSH enabled on a device where it is not allowed'
+                  expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.ssh.enabled)=1 and {$SSH.ALLOWED}=0'
+              tags:
+                - tag: scope
+                  value: notice
+            - uuid: 386b32bb55424c8fa00ff8344289297c
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.ssh.enabled)=1 and {$SSH.ALLOWED}=0'
+              name: 'Security: SSH enabled on a device where it is not allowed'
+              opdata: 'SSH: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SSH is enabled, but this device is not allowed to use it ({$SSH.ALLOWED}=0). Disable it or review the macro.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: f64bb2e462a7467ab00ebb63121e1095
+          name: 'Security: WebSocket'
+          type: DEPENDENT
+          key: hikvision_acs.security.ws.enabled
+          valuemap:
+            name: 'Enabled status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''WebSocket'')].enabled.first()'
+            - type: BOOL_TO_DECIMAL
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+        - uuid: 5f07e4f02f4f4f57820eb8a617faf4c9
+          name: 'Security: WebSocket port'
+          type: DEPENDENT
+          key: hikvision_acs.security.ws.port
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''WebSocket'')].portNo.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: e4345c534f644c9dbce299b9b847c247
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.ws.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.ws.port,#2)'
+              recovery_mode: NONE
+              name: 'Security: WebSocket port has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 7dc66b4039aa40aea7e815c569bf6f0a
+          name: 'Security: WebSocketS'
+          type: DEPENDENT
+          key: hikvision_acs.security.wss.enabled
+          valuemap:
+            name: 'Enabled status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''WebSocketS'')].enabled.first()'
+            - type: BOOL_TO_DECIMAL
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+        - uuid: 45c2b73201424d50b6cda9cd9f517f4d
+          name: 'Security: WebSocketS port'
+          type: DEPENDENT
+          key: hikvision_acs.security.wss.port
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''WebSocketS'')].portNo.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_admin_accesses
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 3ca9505203a3494d9e264aa9f7b82ff6
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.wss.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.wss.port,#2)'
+              recovery_mode: NONE
+              name: 'Security: WebSocketS port has changed ({ITEM.LASTVALUE1})'
+              priority: INFO
+              description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
+              type: MULTIPLE
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 02c3d6dac42f46b69aa4fffefe027746
+          name: 'Time: Clock drift'
+          type: DEPENDENT
+          key: hikvision_acs.time.drift
+          value_type: FLOAT
+          units: s
+          description: 'Difference between the device clock and the Zabbix proxy/server clock. Positive = device ahead.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var t = JSON.parse(value).Time;
+                  if (!t || !t.localTime) throw 'Time.localTime ausente';
+                  var ts = Date.parse(t.localTime);
+                  if (isNaN(ts)) throw 'Formato de data inválido: ' + t.localTime;
+                  return Math.round((ts - Date.now()) / 1000);
+          master_item:
+            key: hikvision_acs.get_time
+          tags:
+            - tag: component
+              value: system
+            - tag: component
+              value: time
+          triggers:
+            - uuid: 5bc6318cdd4d4952b601a039f386255d
+              expression: 'abs(last(/Hikvision access control by HTTP/hikvision_acs.time.drift))>{$TIME.DRIFT.MAX}'
+              name: 'Time: Clock is out of sync (drift > {$TIME.DRIFT.MAX}s)'
+              opdata: 'Drift: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Device clock differs from the Zabbix proxy/server clock by more than {$TIME.DRIFT.MAX} seconds. Access schedules and event timestamps may be wrong.'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: bac04d92516644308fa948fdb4a36226
+          name: 'Time: Local time'
+          type: DEPENDENT
+          key: hikvision_acs.time.local
+          units: unixtime
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var t = JSON.parse(value).Time;
+                  if (!t || !t.localTime) throw 'Time.localTime ausente';
+                  var ts = Date.parse(t.localTime);
+                  if (isNaN(ts)) throw 'Formato de data inválido: ' + t.localTime;
+                  return Math.floor(ts / 1000);
+          master_item:
+            key: hikvision_acs.get_time
+          tags:
+            - tag: component
+              value: system
+            - tag: component
+              value: time
+        - uuid: 96a748c19f25496f926fee93b99164ce
+          name: 'Time: Sync mode'
+          type: DEPENDENT
+          key: hikvision_acs.time.sync_mode
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.Time.timeMode
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_time
+          tags:
+            - tag: component
+              value: system
+            - tag: component
+              value: time
+          triggers:
+            - uuid: bf32442266134b7681e897be5135dca1
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.time.sync_mode)<>"{$TIME.SYNC_MODE}"'
+              name: 'Time: Unexpected sync mode ({ITEM.LASTVALUE1})'
+              opdata: 'Mode: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'Device time synchronization mode differs from the expected mode ({$TIME.SYNC_MODE}). The clock may drift over time.'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 0f35ee859b7d48119c3acc2f23437597
+          name: 'Time: UTC offset'
+          type: DEPENDENT
+          key: hikvision_acs.time.utc_offset
+          value_type: CHAR
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var lt = JSON.parse(value).Time.localTime;
+                  if (!lt) throw 'Time.localTime ausente';
+                  if (/Z$/.test(lt)) return '+00:00';
+                  var m = lt.match(/([+-]\d{2}:\d{2})$/);
+                  if (!m) throw 'Offset não encontrado em: ' + lt;
+                  return m[1];
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_time
+          tags:
+            - tag: component
+              value: system
+            - tag: component
+              value: time
+          triggers:
+            - uuid: 4182976b3986448c9516e4496f432867
+              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.time.utc_offset)<>"{$TIME.UTC_OFFSET}"'
+              name: 'Time: Wrong timezone ({ITEM.LASTVALUE1}, expected {$TIME.UTC_OFFSET})'
+              opdata: 'Offset: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Device UTC offset differs from the expected value. Access schedules and event timestamps may be wrong.'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 7b811f930ed94409a2708357613105b0
+          name: 'VoIP: Status'
+          type: DEPENDENT
+          key: hikvision_acs.voip.status
+          valuemap:
+            name: 'VoIP status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.AcsWorkStatus.voipStatus
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  if (value === 'notEnabled') return 0;
+                  if (value === 'unregistered') return 1;
+                  if (value === 'connect') return 2;
+                  throw 'voipStatus desconhecido: ' + value;
+          master_item:
+            key: hikvision_acs.get_work_status
+          tags:
+            - tag: component
+              value: communication
+            - tag: component
+              value: voip
+          triggers:
+            - uuid: df5e6d7a03b3461abf3e331275668de0
+              expression: 'max(/Hikvision access control by HTTP/hikvision_acs.voip.status,#2)<2 and {$VOIP.EXPECTED}=1'
+              name: 'VoIP: Not registered ({ITEM.LASTVALUE1})'
+              opdata: 'VoIP: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The reader is expected to operate VoIP ({$VOIP.EXPECTED}=1) but is not registered to the SIP server, or VoIP has been disabled. Calls from this reader will not be completed.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: b0996050ed394504b86b9e658a9158a5
+          name: 'Wireless: Addressing type'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.addressing_type
+          value_type: CHAR
+          description: 'IP addressing type of the wireless interface (static or dynamic). "Not present" if the device has no wireless interface.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  return (w.IPAddress || {}).addressingType || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: 83f0b3733f6b49619005b12a116c142b
+          name: 'Network: Wireless connection'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.connection
+          valuemap:
+            name: 'Connection status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.AcsWorkStatus.InterfaceStatusList[?(@.id==2)].netStatus.first()'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  if (value === 'connect') return 1;
+                  if (value === 'disconnect') return 0;
+                  if (value === 'not_present') return 2;
+                  throw 'netStatus desconhecido: ' + value;
+          master_item:
+            key: hikvision_acs.get_work_status
+          tags:
+            - tag: component
+              value: health
+            - tag: component
+              value: network
+        - uuid: cfb1d0d22dfa48169a4eb6a0ea26e305
+          name: 'Wireless: Primary DNS'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.dns_primary
+          value_type: CHAR
+          description: 'Primary DNS server of the wireless interface. "Disabled", "Disconnected" or "Not present" when not applicable.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  if (String(w.Wireless.enabled) !== 'true') return 'Disabled';
+                  var s = w.Wireless.ssid;
+                  if (s === null || s === undefined || String(s).trim() === '' || String(s) === 'null') return 'Disconnected';
+                  return ((w.IPAddress || {}).PrimaryDNS || {}).ipAddress || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: adcfc23cc8aa46e8877c10c2046a39f5
+          name: 'Wireless: Secondary DNS'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.dns_secondary
+          value_type: CHAR
+          description: 'Secondary DNS server of the wireless interface. "Disabled", "Disconnected" or "Not present" when not applicable.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  if (String(w.Wireless.enabled) !== 'true') return 'Disabled';
+                  var s = w.Wireless.ssid;
+                  if (s === null || s === undefined || String(s).trim() === '' || String(s) === 'null') return 'Disconnected';
+                  return ((w.IPAddress || {}).SecondaryDNS || {}).ipAddress || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: 09de4c7f79cd4e258032ae7b1c612b93
+          name: 'Wireless: Gateway'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.gateway
+          value_type: CHAR
+          description: 'Default gateway of the wireless interface. "Disabled", "Disconnected" or "Not present" when not applicable.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  if (String(w.Wireless.enabled) !== 'true') return 'Disabled';
+                  var s = w.Wireless.ssid;
+                  if (s === null || s === undefined || String(s).trim() === '' || String(s) === 'null') return 'Disconnected';
+                  return ((w.IPAddress || {}).DefaultGateway || {}).ipAddress || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: 88f7936cc89b4834a266f17707258beb
+          name: 'Wireless: IP address'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.ip
+          value_type: CHAR
+          description: 'IP address of the wireless interface. "Disabled", "Disconnected" or "Not present" when not applicable.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  if (String(w.Wireless.enabled) !== 'true') return 'Disabled';
+                  var s = w.Wireless.ssid;
+                  if (s === null || s === undefined || String(s).trim() === '' || String(s) === 'null') return 'Disconnected';
+                  return (w.IPAddress || {}).ipAddress || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: fdb1bdbe01684f5dab86529e80c53ad2
+          name: 'Wireless: MAC address'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.mac
+          value_type: CHAR
+          description: 'MAC address of the wireless interface. "Not present" if the device has no wireless interface.'
+          inventory_link: MACADDRESS_B
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  return w.macAddress || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: 1f1a755e98f24e0bac4a69a49a5ab129
+          name: 'Wireless: Security mode'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.security_mode
+          value_type: CHAR
+          description: 'Security mode of the wireless network (e.g., WPA2-personal). "Not present" if the device has no wireless interface.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  return (w.Wireless.WirelessSecurity || {}).securityMode || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: 1c030bcf46404d919a2ca78e8004b1f9
+          name: 'Wireless: SSID'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.ssid
+          value_type: CHAR
+          description: 'SSID of the wireless network the device is connected to. "-" if not connected; "Not present" if the device has no wireless interface.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  var s = w.Wireless.ssid;
+                  var connected = s !== null && s !== undefined && String(s).trim() !== '' && String(s) !== 'null';
+                  return connected ? String(s) : '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+        - uuid: fe261eaffb5f430ea530a35484a06089
+          name: 'Wireless: Status'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.status
+          trends: '0'
+          description: 'Wireless interface status: Disabled, Disconnected, Connected or Not present.'
+          valuemap:
+            name: 'Wireless status'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 3;
+                  if (String(w.Wireless.enabled) !== 'true') return 0;
+                  var s = w.Wireless.ssid;
+                  var connected = s !== null && s !== undefined && String(s).trim() !== '' && String(s) !== 'null';
+                  return connected ? 2 : 1;
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+          triggers:
+            - uuid: fab65221f3944316862c1995dc33d771
+              expression: |
+                last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)>0
+                and last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)<3
+                and {$WLAN.ALLOWED}=0
+              name: 'Wireless: Enabled on a device where it is not allowed'
+              opdata: 'Wireless: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Wireless is enabled, but this device is not allowed to use it ({$WLAN.ALLOWED}=0). Disable it or review the macro.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: 5fc73e03b04e478b80de0c9f9fd8b2a9
+          name: 'Wireless: Subnet mask'
+          type: DEPENDENT
+          key: hikvision_acs.wlan.subnet_mask
+          value_type: CHAR
+          description: 'Subnet mask of the wireless interface. "Disabled", "Disconnected" or "Not present" when not applicable.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var l = JSON.parse(value).NetworkInterfaceList.NetworkInterface;
+                  var w = l.filter(function (i) { return i.Wireless; })[0];
+                  if (!w) return 'Not present';
+                  if (String(w.Wireless.enabled) !== 'true') return 'Disabled';
+                  var s = w.Wireless.ssid;
+                  if (s === null || s === undefined || String(s).trim() === '' || String(s) === 'null') return 'Disconnected';
+                  return (w.IPAddress || {}).subnetMask || '-';
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hikvision_acs.get_network_interfaces
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: wireless
+      discovery_rules:
+        - uuid: dc87c0c3332546a0aaa5ef8fd66ff869
+          name: 'SIP servers discovery'
+          type: DEPENDENT
+          key: hikvision_acs.sip.discovery
+          item_prototypes:
+            - uuid: 9c9a048329984bc5b3ff63600aa82dc9
+              name: 'SIP server {#SIPID}: SIP address'
+              type: DEPENDENT
+              key: 'hikvision_acs.sip.address[{#SIPID}]'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.SIPServerList.SIPServer[?(@.id==''{#SIPID}'')].Standard.proxy.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hikvision_acs.get_sip_servers
+              tags:
+                - tag: component
+                  value: communication
+                - tag: component
+                  value: voip
+            - uuid: d0aacb7a2a744b05a6c39a22520c9760
+              name: 'SIP server {#SIPID}: Display name'
+              type: DEPENDENT
+              key: 'hikvision_acs.sip.display_name[{#SIPID}]'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.SIPServerList.SIPServer[?(@.id==''{#SIPID}'')].Standard.displayName.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hikvision_acs.get_sip_servers
+              tags:
+                - tag: component
+                  value: communication
+                - tag: component
+                  value: voip
+            - uuid: 6b8741c810964e0b924a6cb9fa6ab047
+              name: 'SIP server {#SIPID}: Enabled'
+              type: DEPENDENT
+              key: 'hikvision_acs.sip.enabled[{#SIPID}]'
+              trends: '0'
+              valuemap:
+                name: 'Enabled status'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.SIPServerList.SIPServer[?(@.id==''{#SIPID}'')].Standard.enabled.first()'
+                - type: BOOL_TO_DECIMAL
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hikvision_acs.get_sip_servers
+              tags:
+                - tag: component
+                  value: communication
+                - tag: component
+                  value: voip
+            - uuid: 56d9dee4048c4b0dbdc4cb178310040b
+              name: 'SIP server {#SIPID}: Expires'
+              type: DEPENDENT
+              key: 'hikvision_acs.sip.expires[{#SIPID}]'
+              trends: '0'
+              units: s
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.SIPServerList.SIPServer[?(@.id==''{#SIPID}'')].Standard.expires.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hikvision_acs.get_sip_servers
+              tags:
+                - tag: component
+                  value: communication
+                - tag: component
+                  value: voip
+            - uuid: ee62e07934cd40f8b52ea5fb3ca92692
+              name: 'SIP server {#SIPID}: Extension'
+              type: DEPENDENT
+              key: 'hikvision_acs.sip.extension[{#SIPID}]'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.SIPServerList.SIPServer[?(@.id==''{#SIPID}'')].Standard.userName.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hikvision_acs.get_sip_servers
+              tags:
+                - tag: component
+                  value: communication
+                - tag: component
+                  value: voip
+            - uuid: c47a5cd362db4360a877bf9a2d6962b3
+              name: 'SIP server {#SIPID}: SIP port'
+              type: DEPENDENT
+              key: 'hikvision_acs.sip.port[{#SIPID}]'
+              trends: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.SIPServerList.SIPServer[?(@.id==''{#SIPID}'')].Standard.proxyPort.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hikvision_acs.get_sip_servers
+              tags:
+                - tag: component
+                  value: communication
+                - tag: component
+                  value: voip
+            - uuid: 6405a19b30f54ebb97f8e6e069cfad6d
+              name: 'SIP server {#SIPID}: Registration'
+              type: DEPENDENT
+              key: 'hikvision_acs.sip.registration[{#SIPID}]'
+              trends: '0'
+              valuemap:
+                name: 'SIP registration'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.SIPServerList.SIPServer[?(@.id==''{#SIPID}'')].Standard.registerStatus.first()'
+                - type: BOOL_TO_DECIMAL
+              master_item:
+                key: hikvision_acs.get_sip_servers
+              tags:
+                - tag: component
+                  value: communication
+                - tag: component
+                  value: voip
+          master_item:
+            key: hikvision_acs.get_sip_servers
+          lld_macro_paths:
+            - lld_macro: '{#SIPID}'
+              path: $.id
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.SIPServerList.SIPServer
+      tags:
+        - tag: class
+          value: hardware
+        - tag: subclass
+          value: 'access control'
+        - tag: subclass
+          value: device
+        - tag: subclass
+          value: monitoring
+        - tag: target
+          value: acs
+        - tag: target
+          value: hikvision
+      macros:
+        - macro: '{$CAPACITY.CARDS.MAX}'
+          value: '999999'
+          description: 'Maximum card capacity for the model. High default to avoid division by zero; adjust according to the model.'
+        - macro: '{$CAPACITY.FACES.MAX}'
+          value: '999999'
+          description: 'Maximum model face capacity. High default to avoid division by zero; adjust according to the model.'
+        - macro: '{$CAPACITY.THRESHOLD.INFO}'
+          value: '80'
+          description: 'Occupancy percentage that triggers an alert (Info).'
+        - macro: '{$CAPACITY.THRESHOLD.WARN}'
+          value: '90'
+          description: 'Occupancy percentage that triggers a Warning alert.'
+        - macro: '{$CAPACITY.USERS.MAX}'
+          value: '999999'
+          description: 'Maximum user capacity of the model. High default to avoid division by zero; adjust according to the model.'
+        - macro: '{$HIKCONNECT.ALLOWED}'
+          value: '0'
+          description: 'Set to 1 if Hik-Connect is allowed to be enabled on this device. 0 raises a Warning if it is enabled.'
+        - macro: '{$ISAPI.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'ISAPI user password.'
+        - macro: '{$ISAPI.PORT}'
+          value: '80'
+          description: 'ISAPI port. 443 for https, 80 for http, or the reader''s custom port.'
+        - macro: '{$ISAPI.SCHEME}'
+          value: http
+          description: 'ISAPI access protocol: https or http (default), for readers with HTTPS disabled.'
+        - macro: '{$ISAPI.USER}'
+          value: admin
+          description: 'ISAPI reader user. Read-only dedicated user recommended.'
+        - macro: '{$SSH.ALLOWED}'
+          value: '0'
+          description: 'Set to 1 if SSH is allowed to be enabled on this device. 0 raises a Warning if it is enabled.'
+        - macro: '{$TIME.DRIFT.MAX}'
+          value: '300'
+          description: 'Maximum allowed difference, in seconds, between the device clock and the Zabbix proxy/server clock.'
+        - macro: '{$TIME.SYNC_MODE}'
+          value: NTP
+          description: 'Expected time synchronization mode (e.g., NTP, manual). Use manual when time is set by the VMS via SDK.'
+        - macro: '{$TIME.UTC_OFFSET}'
+          value: '-03:00'
+          description: 'Expected UTC offset of the device (format: ±HH:MM).'
+        - macro: '{$VOIP.EXPECTED}'
+          value: '0'
+          description: 'Set to 1 if the reader operates VoIP and must be registered to the SIP server. 0 disables the VoIP registration alert.'
+        - macro: '{$WLAN.ALLOWED}'
+          value: '0'
+          description: 'Set to 1 if wireless is allowed to be enabled on this device. 0 raises a Warning if it is enabled.'
+      valuemaps:
+        - uuid: 746c59ee626c4ceebbe0645cefac8ee0
+          name: 'Cloud status'
+          mappings:
+            - value: '0'
+              newvalue: Disabled
+            - value: '1'
+              newvalue: Disconnected
+            - value: '2'
+              newvalue: Connected
+        - uuid: f56d5d0c43d14f7f9ecdbf7fd40bd77b
+          name: 'Connection status'
+          mappings:
+            - value: '0'
+              newvalue: Disconnected
+            - value: '1'
+              newvalue: Connected
+            - value: '2'
+              newvalue: 'Not present'
+        - uuid: fa3968300b414f3f9a8d624db50c0263
+          name: 'Enabled status'
+          mappings:
+            - value: '0'
+              newvalue: Disabled
+            - value: '1'
+              newvalue: Enabled
+        - uuid: 6111b57245bd44e69d61ace67d07c9c5
+          name: 'HTTP status'
+          mappings:
+            - value: '0'
+              newvalue: 'No response'
+            - value: '200'
+              newvalue: OK
+            - value: '401'
+              newvalue: Unauthorized
+            - value: '403'
+              newvalue: Forbidden
+            - value: '404'
+              newvalue: 'Not Found'
+            - value: '500'
+              newvalue: 'Internal Server Error'
+            - value: '503'
+              newvalue: Unavailable
+        - uuid: a1adb92893414cff84773a80e5aa1c65
+          name: 'SIP registration'
+          mappings:
+            - value: '0'
+              newvalue: 'Not registered'
+            - value: '1'
+              newvalue: Registered
+        - uuid: fbe4f3c6a6024833b4e5b6813469cf43
+          name: 'VoIP status'
+          mappings:
+            - value: '0'
+              newvalue: Disabled
+            - value: '1'
+              newvalue: 'Not registered'
+            - value: '2'
+              newvalue: Registered
+        - uuid: 1c74250269f040a8bf66d6f7c13724cf
+          name: 'Wireless status'
+          mappings:
+            - value: '0'
+              newvalue: Disabled
+            - value: '1'
+              newvalue: Disconnected
+            - value: '2'
+              newvalue: Connected
+            - value: '3'
+              newvalue: 'Not present'
+  triggers:
+    - uuid: f654a8a88c8a4970b540e4210edc77d6
+      expression: |
+        last(/Hikvision access control by HTTP/hikvision_acs.wlan.addressing_type)="dynamic"
+        and last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)>0
+        and last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)<3
+      name: 'Wireless: DHCP addressing in use'
+      opdata: 'Addressing: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'Wireless interface is using DHCP. If the IP address changes, monitoring and VMS integrations will be lost. Configure a static IP address.'
+      dependencies:
+        - name: 'Wireless: Enabled on a device where it is not allowed'
+          expression: |
+            last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)>0
+            and last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)<3
+            and {$WLAN.ALLOWED}=0
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: b62ddd5cc4e14bffbfb96d1455844326
+      expression: |
+        find(/Hikvision access control by HTTP/hikvision_acs.wlan.security_mode,,"iregexp","^(disable|none|open|wep)$")=1
+        and last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)>0
+        and last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)<3
+      name: 'Wireless: Weak security mode ({ITEM.LASTVALUE1})'
+      opdata: 'Security: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'Wireless is enabled with no encryption or WEP. Configure WPA2 or higher.'
+      dependencies:
+        - name: 'Wireless: Enabled on a device where it is not allowed'
+          expression: |
+            last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)>0
+            and last(/Hikvision access control by HTTP/hikvision_acs.wlan.status)<3
+            and {$WLAN.ALLOWED}=0
+      tags:
+        - tag: scope
+          value: security
