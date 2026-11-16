@@ -10,9 +10,9 @@ zabbix_export:
       description: |
         Monitors Hikvision MinMoe access control readers via ISAPI (HTTP agent): availability, capacity, time, network, VoIP, Hik-Connect and security settings.
         
-        Source: https://github.com/caiovernaglia/zabbix-templates/templates/access_control/hikvision_acs_http/8.0
+        Source: https://github.com/caiovernaglia/zabbix-templates/tree/main/templates/access_control/hikvision_acs_http/8.0
       vendor:
-        name: 'Yellen Group'
+        name: 'Caio Vernaglia'
         version: 8.0-1
       templates:
         - name: 'ICMP Ping'
@@ -594,6 +594,7 @@ zabbix_export:
           name: 'Raw: Network interfaces'
           type: HTTP_AGENT
           key: hikvision_acs.get_network_interfaces
+          delay: 10m
           history: '0'
           value_type: TEXT
           authtype: DIGEST
