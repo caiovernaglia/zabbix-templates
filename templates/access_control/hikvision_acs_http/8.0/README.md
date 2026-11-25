@@ -30,7 +30,7 @@ The template monitors:
 |---|---|---|
 | DS-K1T343MWX | V4.48.40 build 260629 | |
 | DS-K1T344MX  | V4.13.0 build 241025  | |
-| DS-K1T672MX  | V3.18.0 build 240424  | 
+| DS-K1T672MX  | V3.18.0 build 240424  | SIP server discovery is not working in this version.  |
 
 Other MinMoe models exposing the same ISAPI endpoints are expected to work but have not been tested. Reports of tested models and firmware versions are welcome.
 
