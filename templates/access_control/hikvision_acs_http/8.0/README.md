@@ -29,6 +29,8 @@ The template monitors:
 | Model | Firmware | Notes |
 |---|---|---|
 | DS-K1T343MWX | V4.48.40 build 260629 | |
+| DS-K1T344MX  | V4.13.0 build 241025  | |
+| DS-K1T672MX  | V3.18.0 build 240424  | 
 
 Other MinMoe models exposing the same ISAPI endpoints are expected to work but have not been tested. Reports of tested models and firmware versions are welcome.
 
@@ -190,7 +192,6 @@ On devices without a wireless interface, these items return `Not present` (or th
 | Security: HTTPS | `hikvision_acs.security.https.enabled` |
 | Security: HTTPS port | `hikvision_acs.security.https.port` |
 | Security: RTSP port | `hikvision_acs.security.rtsp.port` |
-| Security: SDK port | `hikvision_acs.security.sdk.port` |
 | Security: WebSocket | `hikvision_acs.security.ws.enabled` |
 | Security: WebSocket port | `hikvision_acs.security.ws.port` |
 | Security: WebSocketS | `hikvision_acs.security.wss.enabled` |
@@ -324,5 +325,9 @@ The clock drift tile uses fixed thresholds matching the default `{$TIME.DRIFT.MA
 ## Changelog
 
 ### 8.0-1
-
 - Initial release.
+### 8.0-2
+- Added support for DS-K1T344MX and DS-K1T672MX readers (see tested versions).
+- Removed the SDK check, which is not supported on newer firmware versions.
+- Adjusted Ethernet and wireless interface data collection for devices without wireless support.
+- VoIP status now returns *Not supported* when the device does not report it.

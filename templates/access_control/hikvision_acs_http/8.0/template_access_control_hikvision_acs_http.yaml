@@ -404,15 +404,21 @@ zabbix_export:
           valuemap:
             name: 'Connection status'
           preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.AcsWorkStatus.InterfaceStatusList[?(@.id==1)].netStatus.first()'
             - type: JAVASCRIPT
               parameters:
                 - |
-                  if (value === 'connect') return 1;
-                  if (value === 'disconnect') return 0;
-                  throw 'netStatus desconhecido: ' + value;
+                  var s = JSON.parse(value).AcsWorkStatus || {};
+                  var st;
+                  if (Array.isArray(s.InterfaceStatusList)) {
+                      var i = s.InterfaceStatusList.filter(function (x) { return x.id == 1; })[0];
+                      st = i ? i.netStatus : undefined;
+                  }
+                  if (st === undefined) st = s.netStatus;
+                  if (st === undefined) throw 'netStatus ausente na resposta';
+                  if (st === 'connect') return 1;
+                  if (st === 'disconnect') return 0;
+                  if (/conflict/i.test(st)) return 3;
+                  throw 'netStatus desconhecido: ' + st;
           master_item:
             key: hikvision_acs.get_work_status
           tags:
@@ -543,7 +549,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_acs.get_admin_accesses
           delay: 1h
-          history: '0'
+          history: 1d
           value_type: TEXT
           authtype: DIGEST
           username: '{$ISAPI.USER}'
@@ -674,7 +680,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_acs.get_work_status
           delay: 5m
-          history: '0'
+          history: 1d
           value_type: TEXT
           authtype: DIGEST
           username: '{$ISAPI.USER}'
@@ -922,34 +928,6 @@ zabbix_export:
               expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.rtsp.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.rtsp.port,#2)'
               recovery_mode: NONE
               name: 'Security: RTSP port has changed ({ITEM.LASTVALUE1})'
-              priority: INFO
-              description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
-              type: MULTIPLE
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
-        - uuid: 9278eb34185f432b9b0a78a6d6a21ddf
-          name: 'Security: SDK port'
-          type: DEPENDENT
-          key: hikvision_acs.security.sdk.port
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.AdminAccessProtocolList.AdminAccessProtocol[?(@.protocol==''DEV_MANAGE'')].portNo.first()'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
-          master_item:
-            key: hikvision_acs.get_admin_accesses
-          tags:
-            - tag: component
-              value: security
-          triggers:
-            - uuid: aed27358f96b44cfa49f358e24e69ea3
-              expression: 'last(/Hikvision access control by HTTP/hikvision_acs.security.sdk.port,#1)<>last(/Hikvision access control by HTTP/hikvision_acs.security.sdk.port,#2)'
-              recovery_mode: NONE
-              name: 'Security: SDK port has changed ({ITEM.LASTVALUE1})'
               priority: INFO
               description: 'Port configuration has changed. Check that VMS integrations and remote access still work. Ack to close.'
               type: MULTIPLE
@@ -1224,16 +1202,16 @@ zabbix_export:
           valuemap:
             name: 'VoIP status'
           preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.AcsWorkStatus.voipStatus
             - type: JAVASCRIPT
               parameters:
                 - |
-                  if (value === 'notEnabled') return 0;
-                  if (value === 'unregistered') return 1;
-                  if (value === 'connect') return 2;
-                  throw 'voipStatus desconhecido: ' + value;
+                  var s = JSON.parse(value).AcsWorkStatus || {};
+                  var v = s.voipStatus;
+                  if (v === undefined) return 3;
+                  if (v === 'notEnabled') return 0;
+                  if (v === 'unregistered') return 1;
+                  if (v === 'connect') return 2;
+                  throw 'voipStatus desconhecido: ' + v;
           master_item:
             key: hikvision_acs.get_work_status
           tags:
@@ -1282,16 +1260,19 @@ zabbix_export:
           valuemap:
             name: 'Connection status'
           preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.AcsWorkStatus.InterfaceStatusList[?(@.id==2)].netStatus.first()'
             - type: JAVASCRIPT
               parameters:
                 - |
-                  if (value === 'connect') return 1;
-                  if (value === 'disconnect') return 0;
-                  if (value === 'not_present') return 2;
-                  throw 'netStatus desconhecido: ' + value;
+                  var s = JSON.parse(value).AcsWorkStatus || {};
+                  if (!Array.isArray(s.InterfaceStatusList)) return 2;
+                  var i = s.InterfaceStatusList.filter(function (x) { return x.id == 2; })[0];
+                  if (!i || i.netStatus === undefined) return 2;
+                  var st = i.netStatus;
+                  if (st === 'connect') return 1;
+                  if (st === 'disconnect') return 0;
+                  if (st === 'not_present') return 2;
+                  if (/conflict/i.test(st)) return 3;
+                  throw 'netStatus desconhecido: ' + st;
           master_item:
             key: hikvision_acs.get_work_status
           tags:
@@ -1769,8 +1750,9 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: hostcard
-                  width: '32'
-                  height: '4'
+                  name: 'Device information'
+                  width: '16'
+                  height: '6'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -1800,32 +1782,10 @@ zabbix_export:
                     - type: INTEGER
                       name: sections.2
                       value: '4'
-                - type: item
-                  name: Users
-                  'y': '4'
-                  width: '18'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Hikvision access control by HTTP'
-                        key: 'hikvision_acs.capacity[users,used]'
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                    - type: INTEGER
-                      name: show.1
-                      value: '4'
-                    - type: INTEGER
-                      name: value_size
-                      value: '55'
                 - type: svggraph
                   name: Capacity
                   'y': '6'
-                  width: '37'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1846,46 +1806,71 @@ zabbix_export:
                     - type: INTEGER
                       name: ds.0.width
                       value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
                     - type: STRING
                       name: reference
                       value: THFVI
                     - type: INTEGER
                       name: righty
                       value: '0'
+                - type: problems
+                  x: '16'
+                  width: '28'
+                  height: '6'
+                  fields:
                     - type: STRING
-                      name: time_period.from
-                      value: now-12h
+                      name: reference
+                      value: ZHRME
+                    - type: INTEGER
+                      name: show
+                      value: '3'
+                    - type: INTEGER
+                      name: show_timeline
+                      value: '0'
+                - type: svggraph
+                  name: 'ICMP Response time'
+                  x: '36'
+                  'y': '6'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '0'
                     - type: STRING
-                      name: time_period.to
-                      value: now
+                      name: ds.0.items.0
+                      value: 'ICMP response time'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: INTEGER
+                      name: percentile_left
+                      value: '1'
+                    - type: STRING
+                      name: percentile_left_value
+                      value: '95'
+                    - type: STRING
+                      name: reference
+                      value: EJMJO
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
                 - type: item
-                  name: Faces
-                  x: '18'
-                  'y': '4'
-                  width: '19'
+                  name: ISAPI
+                  x: '44'
+                  width: '7'
                   fields:
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Hikvision access control by HTTP'
-                        key: 'hikvision_acs.capacity[faces,used]'
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                    - type: INTEGER
-                      name: show.1
-                      value: '4'
-                    - type: INTEGER
-                      name: value_size
-                      value: '55'
-                - type: item
-                  name: ISAPI
-                  x: '32'
-                  width: '10'
-                  fields:
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -1929,9 +1914,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: Ethernet
-                  x: '32'
+                  x: '44'
                   'y': '2'
-                  width: '10'
+                  width: '7'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -1956,6 +1941,12 @@ zabbix_export:
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FCCB1D
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -1964,12 +1955,12 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '40'
+                      value: '25'
                 - type: item
-                  name: Cards
-                  x: '37'
+                  name: Users
+                  x: '44'
                   'y': '4'
-                  width: '18'
+                  width: '7'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -1978,7 +1969,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Hikvision access control by HTTP'
-                        key: 'hikvision_acs.capacity[cards,used]'
+                        key: 'hikvision_acs.capacity[users,used]'
                     - type: INTEGER
                       name: show.0
                       value: '2'
@@ -1988,38 +1979,10 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '55'
-                - type: svggraph
-                  name: 'ICMP Response time'
-                  x: '37'
-                  'y': '6'
-                  width: '35'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: ds.0.color_palette
-                      value: '0'
-                    - type: STRING
-                      name: ds.0.items.0
-                      value: 'ICMP response time'
-                    - type: INTEGER
-                      name: percentile_left
-                      value: '1'
-                    - type: STRING
-                      name: percentile_left_value
-                      value: '95'
-                    - type: STRING
-                      name: reference
-                      value: EJMJO
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
-                    - type: INTEGER
-                      name: simple_triggers
-                      value: '1'
                 - type: item
                   name: 'ICMP ping'
-                  x: '42'
-                  width: '10'
+                  x: '51'
+                  width: '7'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -2055,9 +2018,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: Wireless
-                  x: '42'
+                  x: '51'
                   'y': '2'
-                  width: '10'
+                  width: '7'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -2084,17 +2047,46 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: thresholds.2.color
-                      value: '263238'
+                      value: 2B2B2B
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '2'
                     - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
                       name: value_size
-                      value: '40'
+                      value: '25'
+                - type: item
+                  name: Faces
+                  x: '51'
+                  'y': '4'
+                  width: '7'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Hikvision access control by HTTP'
+                        key: 'hikvision_acs.capacity[faces,used]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
                 - type: item
                   name: 'Response time'
-                  x: '52'
-                  width: '10'
+                  x: '58'
+                  width: '7'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2127,9 +2119,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: VoIP
-                  x: '52'
+                  x: '58'
                   'y': '2'
-                  width: '10'
+                  width: '7'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -2144,46 +2136,58 @@ zabbix_export:
                       value: '2'
                     - type: STRING
                       name: thresholds.0.color
-                      value: E65660
+                      value: 2B2B2B
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '1'
+                      value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 3BC97D
+                      value: E65660
                     - type: STRING
                       name: thresholds.1.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 3BC97D
+                    - type: STRING
+                      name: thresholds.2.threshold
                       value: '2'
                     - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: units_show
+                      value: '0'
+                    - type: INTEGER
                       name: value_size
-                      value: '40'
+                      value: '25'
                 - type: item
-                  name: 'Fingerprints (Reserved)'
-                  x: '55'
+                  name: Cards
+                  x: '58'
                   'y': '4'
-                  width: '17'
+                  width: '7'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: RESERVED
                     - type: INTEGER
-                      name: desc_size
-                      value: '55'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '1'
+                      name: decimal_places
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Hikvision access control by HTTP'
-                        key: 'hikvision_acs.capacity[users,used]'
+                        key: 'hikvision_acs.capacity[cards,used]'
                     - type: INTEGER
                       name: show.0
-                      value: '1'
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: value_size
+                      value: '55'
                 - type: item
                   name: 'Clock drift'
-                  x: '62'
-                  width: '10'
+                  x: '65'
+                  width: '7'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2219,9 +2223,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: Hik-Connect
-                  x: '62'
+                  x: '65'
                   'y': '2'
-                  width: '10'
+                  width: '7'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -2260,7 +2264,28 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '40'
+                      value: '25'
+                - type: item
+                  name: 'Fingerprints (Reserved)'
+                  x: '65'
+                  'y': '4'
+                  width: '7'
+                  fields:
+                    - type: STRING
+                      name: description
+                      value: RESERVED
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Hikvision access control by HTTP'
+                        key: 'hikvision_acs.capacity[users,used]'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+            - name: Security
       valuemaps:
         - uuid: 746c59ee626c4ceebbe0645cefac8ee0
           name: 'Cloud status'
@@ -2280,6 +2305,8 @@ zabbix_export:
               newvalue: Connected
             - value: '2'
               newvalue: 'Not present'
+            - value: '3'
+              newvalue: Conflict
         - uuid: fa3968300b414f3f9a8d624db50c0263
           name: 'Enabled status'
           mappings:
@@ -2332,6 +2359,17 @@ zabbix_export:
             - value: '3'
               newvalue: 'Not present'
   triggers:
+    - uuid: 3d79321b580b4244adf1ec55613fdc06
+      expression: |
+        last(/Hikvision access control by HTTP/hikvision_acs.eth.connection)=3
+        or last(/Hikvision access control by HTTP/hikvision_acs.wlan.connection)=3
+      name: 'Network: IP address conflict detected'
+      opdata: 'Ethernet: {ITEM.LASTVALUE1}, Wireless: {ITEM.LASTVALUE2}'
+      priority: AVERAGE
+      description: 'The device reported an IP address conflict on the Ethernet and/or wireless interface. This is usually caused by both interfaces being on the same subnet. Disable wireless or move it to a different subnet. If only the Ethernet interface reports a conflict, check for a duplicate IP address on the network. A device restart may clear the condition temporarily.'
+      tags:
+        - tag: scope
+          value: availability
     - uuid: f654a8a88c8a4970b540e4210edc77d6
       expression: |
         last(/Hikvision access control by HTTP/hikvision_acs.wlan.addressing_type)="dynamic"
